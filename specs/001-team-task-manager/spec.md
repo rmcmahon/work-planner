@@ -21,6 +21,7 @@ As any authenticated user I want to see a prioritized list of tasks on the landi
 2. **Given** tasks exist with priorities and parent/child relationships, **When** a task is dropped onto another, **Then** it becomes a sub-task of the target and is displayed indented under the parent.
 3. **Given** multiple filters are set on the left panel, **When** filters are applied, **Then** tasks shown satisfy all selected filter values (additive filters).
 
+
 ---
 
 ### User Story 2 - Create & Edit Tasks (Priority: P2)
@@ -66,7 +67,7 @@ As an admin I want to manage users and roles and access an admin page so I can g
 - **FR-001**: System MUST provide user authentication with username and password.
 - **FR-002**: System MUST provision a default admin user with username `admin` and password `p@ssw0rd!` on first run.
 - **FR-003**: System MUST provide three roles: `viewer`, `worker`, `admin` with permission rules: viewers = read-only, workers = create tasks and edit tasks assigned to them, admins = full access including user management.
-- **FR-004**: System MUST model tasks with fields: `name`, `description`, `priority` (e.g., low/medium/high or numeric), `owner` (user), `project` (string/id), `delivery_date` (date), `status` (blocked, not blocked, in progress), `parent_task` (nullable for subtasks), and `position` (for ordering within a list).
+- **FR-004**: System MUST model tasks with fields: `name`, `description`, `priority` (e.g., low/medium/high or numeric), `owner` (user), `project` (string/id), `OKR` (Objective Key Results), `delivery_date` (date), `status` (blocked, not blocked, in progress), `parent_task` (nullable for subtasks), and `position` (for ordering within a list).
 - **FR-005**: Tasks MUST be displayed on the dashboard in prioritized order (primary: priority, secondary: explicit manual ordering/position).
 - **FR-006**: System MUST allow tasks to be reordered by drag-and-drop, including moving up/down and dropping onto another task to set `parent_task`.
 - **FR-007**: System MUST provide left-panel additive filters: `owner`, `priority`, `status`, `delivery_date` (range or date), and `project`; filtered results are the intersection of selected filters.
