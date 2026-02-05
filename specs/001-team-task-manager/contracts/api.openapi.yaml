@@ -1,0 +1,722 @@
+openapi: 3.0.0
+info:
+  title: Team Task Manager API
+  description: REST API for task management with role-based access control
+  version: 1.0.0
+  contact:
+    name: Team Task Manager
+    url: https://github.com/rmcmahon/work-planner
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Development server
+  - url: https://api.example.com/api/v1
+    description: Production server (TBD)
+
+tags:
+  - name: Authentication
+    description: Login, token refresh, logout
+  - name: Tasks
+    description: Task CRUD, ordering, filtering
+  - name: Admin
+    description: User management, project settings
+
+paths:
+  /auth/login:
+    post:
+      summary: User login
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                password:
+                  type: string
+                  minLength: 8
+              required:
+                - username
+                - password
+      responses:
+        200:
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  data:
+                    type: object
+                    properties:
+                      access_token:
+                        type: string
+                        description: JWT access token (TTL 1 hour)
+                      refresh_token:
+                        type: string
+                        description: Refresh token (TTL 7 days, stored in HTTP-only cookie)
+                      user:
+                        $ref: '#/components/schemas/User'
+        400:
+          description: Invalid username or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/refresh:
+    post:
+      summary: Refresh access token
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+              required:
+                - refresh_token
+      responses:
+        200:
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  data:
+                    type: object
+                    properties:
+                      access_token:
+                        type: string
+        401:
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /tasks:
+    get:
+      summary: List tasks with optional filters
+      tags:
+        - Tasks
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: owner
+          in: query
+          description: Filter by task owner user ID
+          schema:
+            type: integer
+        - name: priority
+          in: query
+          description: Filter by priority (HIGH, MEDIUM, LOW)
+          schema:
+            type: string
+            enum: [LOW, MEDIUM, HIGH]
+        - name: status
+          in: query
+          description: Filter by status
+          schema:
+            type: string
+            enum: [BLOCKED, NOT_BLOCKED, IN_PROGRESS]
+        - name: project
+          in: query
+          description: Filter by project ID
+          schema:
+            type: integer
+        - name: delivery_date_from
+          in: query
+          description: Filter by delivery date range (from, inclusive)
+          schema:
+            type: string
+            format: date
+        - name: delivery_date_to
+          in: query
+          description: Filter by delivery date range (to, inclusive)
+          schema:
+            type: string
+            format: date
+        - name: skip
+          in: query
+          description: Pagination offset
+          schema:
+            type: integer
+            default: 0
+        - name: limit
+          in: query
+          description: Pagination limit
+          schema:
+            type: integer
+            default: 50
+      responses:
+        200:
+          description: List of tasks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      summary: Create a new task (WORKER or ADMIN)
+      tags:
+        - Tasks
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                description:
+                  type: string
+                  maxLength: 5000
+                priority:
+                  type: string
+                  enum: [LOW, MEDIUM, HIGH]
+                  default: MEDIUM
+                owner_id:
+                  type: integer
+                project_id:
+                  type: integer
+                  nullable: true
+                delivery_date:
+                  type: string
+                  format: date
+                  nullable: true
+                status:
+                  type: string
+                  enum: [BLOCKED, NOT_BLOCKED, IN_PROGRESS]
+                  default: NOT_BLOCKED
+              required:
+                - name
+                - owner_id
+      responses:
+        201:
+          description: Task created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  data:
+                    $ref: '#/components/schemas/Task'
+        400:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: Forbidden (insufficient permissions)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /tasks/{id}:
+    get:
+      summary: Get task by ID
+      tags:
+        - Tasks
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Task details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  data:
+                    $ref: '#/components/schemas/Task'
+        404:
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      summary: Update task (WORKER for own tasks, ADMIN for all)
+      tags:
+        - Tasks
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                priority:
+                  type: string
+                  enum: [LOW, MEDIUM, HIGH]
+                owner_id:
+                  type: integer
+                project_id:
+                  type: integer
+                  nullable: true
+                delivery_date:
+                  type: string
+                  format: date
+                  nullable: true
+                status:
+                  type: string
+                  enum: [BLOCKED, NOT_BLOCKED, IN_PROGRESS]
+      responses:
+        200:
+          description: Task updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  data:
+                    $ref: '#/components/schemas/Task'
+        403:
+          description: Forbidden (insufficient permissions)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Task not found
+
+    delete:
+      summary: Delete task (ADMIN only)
+      tags:
+        - Tasks
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Task deleted
+        403:
+          description: Forbidden (insufficient permissions)
+        404:
+          description: Task not found
+
+  /tasks/{id}/position:
+    patch:
+      summary: Reorder task (change position or parent)
+      tags:
+        - Tasks
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                position:
+                  type: number
+                  description: New position (float for flexible ordering)
+                parent_task_id:
+                  type: integer
+                  nullable: true
+                  description: Parent task ID if making a subtask
+      responses:
+        200:
+          description: Task reordered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  data:
+                    $ref: '#/components/schemas/Task'
+        400:
+          description: Invalid position or cycle detected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /admin/users:
+    get:
+      summary: List all users (ADMIN only)
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+        403:
+          description: Forbidden (requires ADMIN role)
+
+    post:
+      summary: Create a new user (ADMIN only)
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 100
+                password:
+                  type: string
+                  minLength: 8
+                display_name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                  nullable: true
+                role:
+                  type: string
+                  enum: [VIEWER, WORKER, ADMIN]
+              required:
+                - username
+                - password
+                - display_name
+                - role
+      responses:
+        201:
+          description: User created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  data:
+                    $ref: '#/components/schemas/User'
+        400:
+          description: Validation error
+        403:
+          description: Forbidden (requires ADMIN role)
+
+  /admin/users/{id}:
+    patch:
+      summary: Update user role or profile (ADMIN only)
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  enum: [VIEWER, WORKER, ADMIN]
+                display_name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+      responses:
+        200:
+          description: User updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  data:
+                    $ref: '#/components/schemas/User'
+
+    delete:
+      summary: Deactivate user (ADMIN only)
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: User deactivated
+
+  /admin/projects:
+    get:
+      summary: List all projects
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: List of projects
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Project'
+
+    post:
+      summary: Create a new project (ADMIN only)
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                description:
+                  type: string
+                  maxLength: 2000
+              required:
+                - name
+      responses:
+        201:
+          description: Project created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  data:
+                    $ref: '#/components/schemas/Project'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        display_name:
+          type: string
+        email:
+          type: string
+          nullable: true
+        role:
+          type: string
+          enum: [VIEWER, WORKER, ADMIN]
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        priority:
+          type: string
+          enum: [LOW, MEDIUM, HIGH]
+        owner_id:
+          type: integer
+        owner:
+          $ref: '#/components/schemas/User'
+        project_id:
+          type: integer
+          nullable: true
+        delivery_date:
+          type: string
+          format: date
+          nullable: true
+        status:
+          type: string
+          enum: [BLOCKED, NOT_BLOCKED, IN_PROGRESS]
+        parent_task_id:
+          type: integer
+          nullable: true
+        position:
+          type: number
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by:
+          type: integer
+
+    Project:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Error:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [error]
+        message:
+          type: string
+        code:
+          type: string
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token (Authorization header)
