@@ -73,26 +73,26 @@ description: "Task list for Team Task Manager implementation"
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T024 [P] Contract test for GET /api/v1/tasks endpoint in `backend/tests/test_tasks.py` (mock 10 sample tasks, verify response schema)
-- [ ] T025 [P] Unit test for task ordering logic in `backend/tests/test_tasks.py` (priority DESC, then position ASC)
-- [ ] T026 [P] Unit test for additive filtering (owner + priority + status + delivery_date + project) in `backend/tests/test_tasks.py`
-- [ ] T027 [P] Unit test for subtask parent-child validation in `backend/tests/test_tasks.py` (no cycles, no self-parent)
-- [ ] T028 [P] Integration test for Dashboard page render in `frontend/tests/pages/DashboardPage.test.tsx` (mock API, verify task list renders)
-- [ ] T029 [P] Integration test for FilterPanel filter logic in `frontend/tests/components/FilterPanel.test.tsx` (apply filters, verify query params)
-- [ ] T030 Integration test for drag-drop reorder in `frontend/tests/components/TaskList.test.tsx` (mock react-beautiful-dnd, verify position change)
+- [X] T024 [P] Contract test for GET /api/v1/tasks endpoint in `backend/tests/test_tasks.py` (mock 10 sample tasks, verify response schema)
+- [X] T025 [P] Unit test for task ordering logic in `backend/tests/test_tasks.py` (priority DESC, then position ASC)
+- [X] T026 [P] Unit test for additive filtering (owner + priority + status + delivery_date + project) in `backend/tests/test_tasks.py`
+- [X] T027 [P] Unit test for subtask parent-child validation in `backend/tests/test_tasks.py` (no cycles, no self-parent)
+- [X] T028 [P] Integration test for Dashboard page render in `frontend/tests/pages/DashboardPage.test.tsx` (mock API, verify task list renders)
+- [X] T029 [P] Integration test for FilterPanel filter logic in `frontend/tests/components/FilterPanel.test.tsx` (apply filters, verify query params)
+- [X] T030 Integration test for drag-drop reorder in `frontend/tests/components/TaskList.test.tsx` (mock react-beautiful-dnd, verify position change)
 
 ### Implementation for User Story 1
 
-- [ ] T031 [P] Implement GET /api/v1/tasks endpoint in `backend/src/tasks/routes.py` with query param filters (owner, priority, status, delivery_date_from, delivery_date_to, project)
-- [ ] T032 [P] Implement task ordering service function in `backend/src/tasks/service.py` (sort by priority DESC, then position ASC)
-- [ ] T033 [P] Implement task filtering service function in `backend/src/tasks/service.py` (apply additive filters: AND logic)
-- [ ] T034 [P] Implement subtask hierarchy fetch in `backend/src/tasks/service.py` (return parent and child tasks)
+- [X] T031 [P] Implement GET /api/v1/tasks endpoint in `backend/src/tasks/routes.py` with query param filters (owner, priority, status, delivery_date_from, delivery_date_to, project)
+- [X] T032 [P] Implement task ordering service function in `backend/src/tasks/service.py` (sort by priority DESC, then position ASC)
+- [X] T033 [P] Implement task filtering service function in `backend/src/tasks/service.py` (apply additive filters: AND logic)
+- [X] T034 [P] Implement subtask hierarchy fetch in `backend/src/tasks/service.py` (return parent and child tasks)
 - [ ] T035 Implement database indexes in `backend/src/db/` on Task.owner_id, Task.priority, Task.status, Task.delivery_date, Task.project_id for filter query performance
-- [ ] T036 [P] Implement LoginPage component in `frontend/src/pages/LoginPage.tsx` with username/password form, login API call, token storage
-- [ ] T037 [P] Implement DashboardPage component in `frontend/src/pages/DashboardPage.tsx` (fetch tasks, manage filter state, render TaskList + FilterPanel)
-- [ ] T038 [P] Implement TaskList component in `frontend/src/components/TaskList.tsx` (render tasks with react-beautiful-dnd, handle drag-drop, call reorder API)
-- [ ] T039 [P] Implement TaskCard component in `frontend/src/components/TaskCard.tsx` (display task name, priority badge, owner, delivery date, status)
-- [ ] T040 [P] Implement FilterPanel component in `frontend/src/components/FilterPanel.tsx` (owner, priority, status, delivery_date, project filter controls)
+- [X] T036 [P] Implement LoginPage component in `frontend/src/pages/LoginPage.tsx` with username/password form, login API call, token storage
+- [X] T037 [P] Implement DashboardPage component in `frontend/src/pages/DashboardPage.tsx` (fetch tasks, manage filter state, render TaskList + FilterPanel)
+- [X] T038 [P] Implement TaskList component in `frontend/src/components/TaskList.tsx` (render tasks with react-beautiful-dnd, handle drag-drop, call reorder API)
+- [X] T039 [P] Implement TaskCard component in `frontend/src/components/TaskCard.tsx` (display task name, priority badge, owner, delivery date, status)
+- [X] T040 [P] Implement FilterPanel component in `frontend/src/components/FilterPanel.tsx` (owner, priority, status, delivery_date, project filter controls)
 - [ ] T041 Implement PATCH /api/v1/tasks/:id/position endpoint in `backend/src/tasks/routes.py` to handle drag-drop reorder and parent assignment
 - [ ] T042 Implement parent-task validation service in `backend/src/tasks/service.py` (cycle detection, self-parent prevention)
 - [ ] T043 Add validation and error handling to task endpoints in `backend/src/tasks/routes.py` (400 for invalid input, 404 for not found)

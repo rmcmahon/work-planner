@@ -1,0 +1,19 @@
+.task-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+.task-list-empty {
+  padding: 2rem;
+  text-align: center;
+  color: #999;
+  font-style: italic;
+}
+
+.task-list.drag-over {
+  background-color: #f0f0f0;
+  border: 2px dashed #667eea;
+}
