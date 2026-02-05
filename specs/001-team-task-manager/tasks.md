@@ -26,13 +26,13 @@ description: "Task list for Team Task Manager implementation"
 
 **Purpose**: Project initialization, dependencies, and basic structure
 
-- [ ] T001 Initialize Python 3.11 backend project structure in `backend/` with venv, requirements.txt
-- [ ] T002 Initialize React 18 frontend project structure in `frontend/` with package.json and webpack/create-react-app config
-- [ ] T003 [P] Set up pytest for backend testing in `backend/tests/` with conftest.py and test fixtures
-- [ ] T004 [P] Set up Jest + React Testing Library for frontend testing in `frontend/tests/`
-- [ ] T005 [P] Configure linting and formatting: backend (black, flake8), frontend (eslint, prettier)
-- [ ] T006 [P] Create `.env.example` files for backend and frontend with all required variables
-- [ ] T007 Create `docker-compose.yml` with PostgreSQL option for future and SQLite for MVP
+- [X] T001 Initialize Python 3.11 backend project structure in `backend/` with venv, requirements.txt
+- [X] T002 Initialize React 18 frontend project structure in `frontend/` with package.json and webpack/create-react-app config
+- [X] T003 [P] Set up pytest for backend testing in `backend/tests/` with conftest.py and test fixtures
+- [X] T004 [P] Set up Jest + React Testing Library for frontend testing in `frontend/tests/`
+- [X] T005 [P] Configure linting and formatting: backend (black, flake8), frontend (eslint, prettier)
+- [X] T006 [P] Create `.env.example` files for backend and frontend with all required variables
+- [X] T007 Create `docker-compose.yml` with PostgreSQL option for future and SQLite for MVP
 
 ---
 
