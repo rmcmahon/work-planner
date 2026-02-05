@@ -4,11 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from app.core.config import settings
-from app.core.database import Base, engine
+from app.core.database import Base, engine, SessionLocal
+from app.core.init_db import init_db
 from app.api import router
 
-# Create tables on startup
-Base.metadata.create_all(bind=engine)
+# Import models to register them with SQLAlchemy
+from app.models import User, Task, Project, TaskAudit  # noqa: F401
 
 
 @asynccontextmanager
@@ -17,6 +18,14 @@ async def lifespan(app: FastAPI):
     # Startup
     print(f"Starting {settings.app_name} - Environment: {settings.environment}")
     Base.metadata.create_all(bind=engine)
+    
+    # Initialize database with default data
+    db = SessionLocal()
+    try:
+        init_db(db)
+    finally:
+        db.close()
+    
     yield
     # Shutdown
     print(f"Shutting down {settings.app_name}")

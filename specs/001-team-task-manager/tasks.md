@@ -42,22 +42,22 @@ description: "Task list for Team Task Manager implementation"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T008 Set up FastAPI app entry point in `backend/src/main.py` with CORS middleware for frontend
-- [ ] T009 [P] Configure SQLAlchemy ORM and database connection in `backend/src/db/database.py` for SQLite
-- [ ] T010 [P] Define User ORM model in `backend/src/auth/models.py` with role enum (VIEWER, WORKER, ADMIN)
-- [ ] T011 [P] Define Task ORM model in `backend/src/tasks/models.py` with priority, status, parent_task_id, position fields
-- [ ] T012 [P] Define Project ORM model in `backend/src/tasks/models.py` (or separate file)
+- [X] T008 Set up FastAPI app entry point in `backend/src/main.py` with CORS middleware for frontend
+- [X] T009 [P] Configure SQLAlchemy ORM and database connection in `backend/src/db/database.py` for SQLite
+- [X] T010 [P] Define User ORM model in `backend/src/auth/models.py` with role enum (VIEWER, WORKER, ADMIN)
+- [X] T011 [P] Define Task ORM model in `backend/src/tasks/models.py` with priority, status, parent_task_id, position fields
+- [X] T012 [P] Define Project ORM model in `backend/src/tasks/models.py` (or separate file)
 - [ ] T013 Create database migration setup with Alembic in `backend/alembic/` for future schema changes
-- [ ] T014 Implement database initialization and seeding in `backend/src/db/init_db.py` (provision admin user: username=admin, password=p@ssw0rd!)
-- [ ] T015 [P] Implement password hashing service in `backend/src/auth/service.py` using bcrypt
-- [ ] T016 [P] Implement JWT token generation and verification in `backend/src/auth/service.py`
-- [ ] T017 Create JWT middleware in `backend/src/middleware/auth.py` to verify and extract token from Authorization header
-- [ ] T018 [P] Implement role-based access control (RBAC) helper in `backend/src/auth/service.py` with permission checks
-- [ ] T019 Set up frontend App.tsx root component in `frontend/src/App.tsx` with routing (React Router v6)
-- [ ] T020 [P] Create AuthContext in `frontend/src/context/AuthContext.tsx` for global auth state management
-- [ ] T021 [P] Create ProtectedRoute component in `frontend/src/components/ProtectedRoute.tsx` to guard routes by authentication/role
-- [ ] T022 Create axios/fetch client wrapper in `frontend/src/api/client.ts` with JWT token injection in headers
-- [ ] T023 Set up global CSS in `frontend/src/styles/index.css` with WCAG 2.1 AA color contrast (semantic HTML baseline)
+- [X] T014 Implement database initialization and seeding in `backend/src/db/init_db.py` (provision admin user: username=admin, password=p@ssw0rd!)
+- [X] T015 [P] Implement password hashing service in `backend/src/auth/service.py` using bcrypt
+- [X] T016 [P] Implement JWT token generation and verification in `backend/src/auth/service.py`
+- [X] T017 Create JWT middleware in `backend/src/middleware/auth.py` to verify and extract token from Authorization header
+- [X] T018 [P] Implement role-based access control (RBAC) helper in `backend/src/auth/service.py` with permission checks
+- [X] T019 Set up frontend App.tsx root component in `frontend/src/App.tsx` with routing (React Router v6)
+- [X] T020 [P] Create AuthContext in `frontend/src/context/AuthContext.tsx` for global auth state management
+- [X] T021 [P] Create ProtectedRoute component in `frontend/src/components/ProtectedRoute.tsx` to guard routes by authentication/role
+- [X] T022 Create axios/fetch client wrapper in `frontend/src/api/client.ts` with JWT token injection in headers
+- [X] T023 Set up global CSS in `frontend/src/styles/index.css` with WCAG 2.1 AA color contrast (semantic HTML baseline)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
